@@ -1,41 +1,170 @@
-import 'dart:typed_data';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:flutter/services.dart';
+import 'package:excel/excel.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
-class OcrService {
-  // دالة حقيقية لقراءة الدرجة المتواجدة على يسار كود الـ QR
-  Future<String> readGradeFromLeftOfQr(Uint8List imageBytes) async {
-    try {
-      // 1. تحويل البايتات إلى ملف مؤقت لأن مكتبة جوجل تحتاج مسار ملف
-      final tempDir = await getTemporaryDirectory();
-      final file = await File('${tempDir.path}/temp_ocr_image.png').create();
-      await file.writeAsBytes(imageBytes);
+class PdfGeneratorService {
+  static Future<String> generatePapers({
+    required Excel excelData,
+    required String qrFolderPath,
+    required String selectedClass,      // الصف المختار من القائمة (مثلاً: "رابع")
+    required String selectedSubject,    // المادة المختارة (مثلاً: "العلوم")
+    required String outputPath,
+  }) async {
+    final pdf = pw.Document();
 
-      // 2. تهيئة المعالج وصورة المدخلات
-      final inputImage = InputImage.fromFile(file);
-      final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    // تحميل خط الأميري لضمان ظهور العربية بشكل سليم
+    final fontData = await rootBundle.load("assets/fonts/Amiri_Regular.ttf");
+    final ttfFont = pw.Font.ttf(fontData);
 
-      // 3. معالجة الصورة واستخراج النصوص
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
-      
-      // إغلاق المعالج لتحرير الذاكرة
-      await textRecognizer.close();
+    String sheetName = excelData.tables.keys.first;
+    var sheet = excelData.tables[sheetName]!;
 
-      // 4. البحث عن أول رقم يمثل الدرجة في النص المستخرج
-      String extractedText = recognizedText.text.trim();
-      
-      // تعبير نمطي (RegExp) للبحث عن أي رقم مكون من خانة أو خانتين داخل النص
-      RegExp regExp = RegExp(r'\b\d{1,2}\b'); 
-      Match? match = regExp.firstMatch(extractedText);
+    int generatedCount = 0;
 
-      if (match != null) {
-        return match.group(0)!; // إرجاع الدرجة الحقيقية المستخرجة
-      } else {
-        return "لم يتم رصد درجة"; // في حال لم يجد أي رقم في منطقة الفحص
+    for (int i = 1; i < sheet.maxRows; i++) {
+      var row = sheet.rows[i];
+      if (row.isEmpty || row.length < 3 || row[0]?.value == null) continue;
+
+      String studentClass = row[2]?.value?.toString().trim() ?? "";
+
+      // الفلترة بناءً على الصف الدراسي
+      if (studentClass.toLowerCase() != selectedClass.trim().toLowerCase()) {
+        continue; 
       }
-    } catch (e) {
-      return "خطأ في القراءة: $e";
+
+      // قراءة بيانات الطالب (تم إصلاح الترتيب ليتوافق مع الإكسيل)
+      String studentId = row[0]?.value?.toString().trim() ?? "0000";
+      String studentName = row[1]?.value?.toString().trim() ?? "طالب مجهول";
+
+      final qrFile = File("$qrFolderPath/$studentId.png");
+      pw.MemoryImage? qrImage;
+      if (await qrFile.exists()) {
+        qrImage = pw.MemoryImage(await qrFile.readAsBytes());
+      }
+
+      generatedCount++;
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4.copyWith(
+            marginTop: 4 * PdfPageFormat.mm,
+            marginBottom: 4 * PdfPageFormat.mm,
+            marginLeft: 4 * PdfPageFormat.mm,
+            marginRight: 4 * PdfPageFormat.mm,
+          ),
+          theme: pw.ThemeData.withFont(
+            base: ttfFont,
+            bold: ttfFont,
+          ).copyWith(
+            defaultTextStyle: pw.TextStyle(font: ttfFont, fontSize: 14),
+          ),
+          build: (pw.Context context) {
+            return pw.Directionality(
+              textDirection: pw.TextDirection.rtl,
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  // ====== أعلى يسار الصفحة ======
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    children: [
+                      pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.grey400, width: 1),
+                        ),
+                        child: pw.Row(
+                          children: [
+                            pw.Text("اسم الطالب: $studentName", style: pw.TextStyle(font: ttfFont, fontSize: 12)),
+                            pw.SizedBox(width: 25),
+                            pw.Text("رقم القيد: $studentId", style: pw.TextStyle(font: ttfFont, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  pw.Spacer(),
+
+                  // ====== أسفل الصفحة ======
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.start,
+                    crossAxisAlignment: pw.CrossAxisAlignment.end,
+                    children: [
+                      pw.Row(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          // 1. [رقم/رمز المادة]
+                          pw.Container(
+                            width: 40,
+                            height: 40,
+                            alignment: pw.Alignment.center,
+                            decoration: pw.BoxDecoration(
+                              border: pw.Border.all(color: PdfColors.black, width: 1.5),
+                            ),
+                            child: pw.Text(
+                              selectedSubject,
+                              style: pw.TextStyle(font: ttfFont, fontSize: 16, fontWeight: pw.FontWeight.bold),
+                            ),
+                          ),
+                          pw.SizedBox(width: 10),
+
+                          // 2. [رمز الاستجابة السريعة QR]
+                          pw.Container(
+                            width: 40,
+                            height: 40,
+                            decoration: pw.BoxDecoration(
+                              border: pw.Border.all(color: PdfColors.grey400, width: 0.5),
+                            ),
+                            child: qrImage != null
+                                ? pw.Image(qrImage, fit: pw.BoxFit.cover)
+                                : pw.SizedBox(), 
+                          ),
+                          pw.SizedBox(width: 10),
+
+                          // 3. [مربع رصد الدرجة فارغ ومطابق للمقاييس]
+                          pw.Container(
+                            width: 40,
+                            height: 40,
+                            decoration: pw.BoxDecoration(
+                              color: const PdfColor.fromInt(0xFFEBF3F9),
+                              border: pw.Border.all(color: PdfColors.blueAccent, width: 1.5),
+                            ),
+                            child: pw.SizedBox(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
     }
+
+    if (generatedCount == 0) {
+      pdf.addPage(
+        pw.Page(
+          build: (pw.Context context) => pw.Center(
+            child: pw.Text(
+              "لم يتم العثور على طلاب مسجلين في صف: $selectedClass",
+              style: pw.TextStyle(font: ttfFont, fontSize: 18),
+              textDirection: pw.TextDirection.rtl,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ====== التعديل المطلب: تغيير التسمية لتصبح (امتحانات_الصف_المادة.pdf) ======
+    final String finalFileName = "$outputPath/امتحانات_${selectedClass}_$selectedSubject.pdf";
+    final file = File(finalFileName);
+    await file.writeAsBytes(await pdf.save());
+
+    return finalFileName;
   }
 }
