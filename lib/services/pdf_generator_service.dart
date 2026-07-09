@@ -15,7 +15,7 @@ class PdfGeneratorService {
     final pdf = pw.Document();
 
     // تحميل خط الأميري لضمان ظهور العربية بشكل سليم
-    final fontData = await rootBundle.load("assets/fonts/Amiri_Regular.ttf");
+    final fontData = await rootBundle.load("assets/fonts/Amiri-Regular.ttf");
     final ttfFont = pw.Font.ttf(fontData);
 
     String sheetName = excelData.tables.keys.first;
@@ -77,9 +77,9 @@ class PdfGeneratorService {
                         ),
                         child: pw.Row(
                           children: [
-                            pw.Text("اسم الطالب: $studentName", style: pw.TextStyle(font: ttfFont, fontSize: 12)),
+                            pw.Text("اسم الطالب: $studentName", style: pw.TextStyle(font: ttfFont, fontSize: 14)),
                             pw.SizedBox(width: 25),
-                            pw.Text("رقم القيد: $studentId", style: pw.TextStyle(font: ttfFont, fontSize: 12)),
+                            pw.Text("رقم القيد: $studentId", style: pw.TextStyle(font: ttfFont, fontSize: 14)),
                           ],
                         ),
                       ),
@@ -113,8 +113,8 @@ class PdfGeneratorService {
 
                           // 2. [رمز الاستجابة السريعة QR]
                           pw.Container(
-                            width: 40,
-                            height: 40,
+                            width: 60,
+                            height: 60,
                             decoration: pw.BoxDecoration(
                               border: pw.Border.all(color: PdfColors.grey400, width: 0.5),
                             ),
