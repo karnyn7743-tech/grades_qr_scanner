@@ -1,31 +1,37 @@
 import 'package:flutter/material.dart';
-import 'screens/exam_generator_screen.dart'; // استيراد شاشة التوليد مباشرة
+import 'package:permission_handler/permission_handler.dart';
+import 'screens/home_screen.dart'; // استيراد الشاشة الرئيسية المستقلة الجديدة
 
-void main() {
-  runApp(const ExamAutomationApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // طلب صلاحيات الوصول إلى الذاكرة والتخزين عند بدء التشغيل
+  await _requestPermissions();
+  
+  runApp(const MyApp());
 }
 
-class ExamAutomationApp extends StatelessWidget {
-  const ExamAutomationApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'نظام أتمتة طباعة الاختبارات',
-      debugShowCheckedModeBanner: false,
-      // ضبط الثيم العام للتطبيق ليتوافق مع ألوان الهوية البصرية الجديدة
+      title: 'صانع أوراق الاختبارات',
       theme: ThemeData(
-        primaryColor: const Color(0xff029ae4),
-        scaffoldBackgroundColor: const Color(0xffeef7fe),
-        fontFamily: 'Cairo', // تعيين الخط العربي الافتراضي لواجهات التطبيق
-        appBarTheme: const AppBarTheme(
-          backgroundColor: const Color(0xff029ae4),
-          centerTitle: true,
-          elevation: 2,
-        ),
+        primarySwatch: Colors.blue,
+        useMaterialDesign: true,
       ),
-      // جعل شاشة توليد أوراق الاختبارات هي الشاشة الرئيسية للتطبيق
-      home: const ExamGeneratorScreen(),
+      debugShowCheckedModeBanner: false,
+      home: const HomeScreen(), // توجيه التطبيق ليفتح مباشرة على واجهة التوليد المرنة
     );
+  }
+}
+
+// دالة فحص وتأكيد الصلاحيات لضمان حفظ الـ PDF بدون قيود النظام
+Future<void> _requestPermissions() async {
+  var status = await Permission.storage.status;
+  if (!status.isGranted) {
+    await Permission.storage.request();
   }
 }
