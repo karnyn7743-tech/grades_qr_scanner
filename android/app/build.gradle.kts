@@ -8,7 +8,7 @@ android {
     // تحديد رقم إصدار الأندرويد كـ رقم مجرد وليس نص
     compileSdk = 35
 
-    namespace = "com.example.school_grading_app"
+    namespace = "com.example.maker_exampapers"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
