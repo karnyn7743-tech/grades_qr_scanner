@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         // معرف التطبيق الخاص بك
-        applicationId = "com.example.school_grading_app"
+        applicationId = "com.example.maker_exampapers"
         
         // الحد الأدنى لدعم الهواتف (رقم مجرد)
         minSdk = 21
