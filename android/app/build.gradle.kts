@@ -6,7 +6,7 @@ plugins {
 
 android {
     // تحديد رقم إصدار الأندرويد كـ رقم مجرد وليس نص
-    compileSdk = 35
+    compileSdk = 36
 
     namespace = "com.example.maker_exampapers"
 
@@ -28,7 +28,7 @@ android {
         minSdk = 21
         
         // الإصدار المستهدف (رقم مجرد ومتوافق مع الكاميرا)
-        targetSdk = 35
+        targetSdk = 36
         
         versionCode = flutter.versionCode
         versionName = flutter.versionName
