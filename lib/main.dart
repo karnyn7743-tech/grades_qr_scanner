@@ -12,15 +12,15 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'صانع أوراق الاختبارات',
+      title: 'ذو القرنين الهاشمي لإعداد وتوليد أوراق الاختبارات',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        useMaterialDesign: true,
+        useMaterial3: true, // تم تعديل الخيار هنا لدعم إصدارات Flutter الحديثة
       ),
       debugShowCheckedModeBanner: false,
       home: const HomeScreen(), // توجيه التطبيق ليفتح مباشرة على واجهة التوليد المرنة
