@@ -8,7 +8,7 @@ android {
     // تحديد رقم إصدار الأندرويد كـ رقم مجرد وليس نص
     compileSdk = 36
 
-    namespace = "com.example.maker_exampapers"
+    namespace = "com.example.generator_app"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         // معرف التطبيق الخاص بك
-        applicationId = "com.example.maker_exampapers"
+        applicationId = "com.example.generator_app"
         
         // الحد الأدنى لدعم الهواتف (رقم مجرد)
         minSdk = 21
