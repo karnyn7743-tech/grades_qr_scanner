@@ -1,6 +1,7 @@
-name: maker_exampapers
-description: "تطبيق إعداد وتوليد أوراق الإختبارات "
+name: generator_app
+description: "تطبيق مولّد مفاتيح التفعيل المخصص لتطبيق طالوت الهاشمي للاتصالات المحلية"
 publish_to: 'none'
+
 version: 1.0.0+1
 
 environment:
@@ -9,12 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
-  # المكتبات الأساسية للمشروع المحدث
-  excel: ^4.0.0
-  pdf: ^3.10.4
-  file_picker: ^8.0.0
-  permission_handler: ^11.0.1
+  # مكتبة التشفير لتوليد المفاتيح بنفس خوارزمية SHA-256
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -23,12 +20,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  # حزم ملف الخط بالاسم والامتداد الصحيح تماماً
-  assets:
-    - assets/fonts/Amiri_Regular.ttf
-
-  fonts:
-    - family: Amiri
-      fonts:
-        - asset: assets/fonts/Amiri_Regular.ttf
