@@ -1,45 +1,35 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    // إضافة الإضافة الخاصة بالفلاتر
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
-    // تحديد رقم إصدار الأندرويد كـ رقم مجرد وليس نص
-    compileSdk = 36
-
-    namespace = "com.example.generator_app"
+    namespace = "com.example.generator_app" // قم باستبداله باسم الباكيج الخاص بمشروعك إذا كان مختلفًا
+    compileSdk = 34
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        // الصيغة الصحيحة والمتوافقة لتحديد jvmTarget بدون أخطاء
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
 
     defaultConfig {
-        // معرف التطبيق الخاص بك
-        applicationId = "com.example.generator_app"
-        
-        // الحد الأدنى لدعم الهواتف (رقم مجرد)
+        applicationId = "com.example.generator_app" // قم باستبداله باسم الباكيج الخاص بك
         minSdk = 21
-        
-        // الإصدار المستهدف (رقم مجرد ومتوافق مع الكاميرا)
-        targetSdk = 36
-        
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0.0"
     }
 
     buildTypes {
         release {
-            // إعدادات التوقيع الافتراضية للبناء التجريبي والمستقر
+            // التوقيع الافتراضي للبناء النسبي
             signingConfig = signingConfigs.getByName("debug")
-            
-            // تفعيل التحسين لحل مشاكل المكتبات الخارجية مثل ML Kit
             isMinifyEnabled = false
             isShrinkResources = false
         }
@@ -48,4 +38,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7")
 }
