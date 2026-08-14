@@ -13,7 +13,7 @@ class KeyGeneratorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'مولّد المفاتيح - طالوت الهاشمي',
+      title: 'مولّد مفاتيح_واي فاي طالوت ',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
