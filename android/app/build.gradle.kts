@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.control_kay_gen" // قم باستبداله باسم الباكيج الخاص بمشروعك إذا كان مختلفًا
+    namespace = "com.example.key_generator_app" // قم باستبداله باسم الباكيج الخاص بمشروعك إذا كان مختلفًا
     compileSdk = 35
 
     compileOptions {
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.control_kay_gen" // قم باستبداله باسم الباكيج الخاص بك
+        applicationId = "com.example.key_generator_app" // قم باستبداله باسم الباكيج الخاص بك
         minSdk = 21
         targetSdk = 35
         versionCode = 1
