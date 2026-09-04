@@ -1,5 +1,5 @@
-name: generator_app
-description: "تطبيق مولّد مفاتيح التفعيل المخصص لتطبيق طالوت الهاشمي للاتصالات المحلية"
+name: control_kay_gen
+description: "تطبيق مولّد مفاتيح التفعيل المخصص لتطبيق الأتمتة المصغرة للإختبارات"
 publish_to: 'none'
 
 version: 1.0.0+1
