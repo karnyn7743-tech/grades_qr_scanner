@@ -14,10 +14,6 @@ dependencies:
   # مكتبة التشفير لتوليد المفاتيح بنفس خوارزمية SHA-256
   crypto: ^3.0.3
 
-  # مكتبة دعم الخدمات والنظام للتعامل مع الحافظة (Copy/Paste)
-  flutter_services:
-    sdk: flutter
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
