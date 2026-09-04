@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.control_kay_gen" // قم باستبداله باسم الباكيج الخاص بمشروعك إذا كان مختلفًا
-    compileSdk = 34
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId = "com.example.control_kay_gen" // قم باستبداله باسم الباكيج الخاص بك
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
     }
