@@ -13,7 +13,7 @@ class KeyGeneratorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'مولّد تراخيص الاختبارات',
+      title: 'مولّد تراخيص لمولد أوراق الاختبارات',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,
