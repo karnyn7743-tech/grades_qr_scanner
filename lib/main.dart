@@ -8,24 +8,31 @@ void main() {
 }
 
 class KeyGeneratorApp extends StatelessWidget {
-  const KeyGeneratorApp({Key? key}) : super(key: key);
+  const KeyGeneratorApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'مولّد مفاتيح_واي فاي طالوت ',
+      title: 'مولد مفاتيح تفعيل الأتمتة المصغرة للإختبارات',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.teal,
         useMaterial3: true,
+        fontFamily: 'Cairo',
       ),
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+      },
       home: const GeneratorHomeScreen(),
     );
   }
 }
 
 class GeneratorHomeScreen extends StatefulWidget {
-  const GeneratorHomeScreen({Key? key}) : super(key: key);
+  const GeneratorHomeScreen({super.key});
 
   @override
   State<GeneratorHomeScreen> createState() => _GeneratorHomeScreenState();
@@ -33,163 +40,142 @@ class GeneratorHomeScreen extends StatefulWidget {
 
 class _GeneratorHomeScreenState extends State<GeneratorHomeScreen> {
   final TextEditingController _deviceIdController = TextEditingController();
+  String _generatedCode = "";
+  
+  // نفس المفتاح السري المعتمد في تطبيق الكنترول
+  static const String _secretSalt = "STUGRA_SCAN_SECRET_KEY_2026";
 
-  // 🔑 كلمة السر السرية المتطابقة تماماً مع LicenseService
-  final String _secretSalt = "MyCustomAppSecret_2026_@Key";
-
-  String _generatedKey = "";
-
-  void _generateKey() {
-    FocusScope.of(context).unfocus(); // إغلاق لوحة المفاتيح
-    final deviceId = _deviceIdController.text.trim();
-
+  void _generateCode() {
+    String deviceId = _deviceIdController.text.trim();
     if (deviceId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال معرّف الجهاز أولاً!')),
+        const SnackBar(content: Text("يرجى إدخال معرف الجهاز أولاً!")),
       );
       return;
     }
 
-    // نفس خوارزمية التوليد المطابقة لتطبيق الاتصالات
-    final rawData = "$deviceId|$_secretSalt";
-    final bytes = utf8.encode(rawData);
-    final digest = sha256.convert(bytes);
-    final hexString = digest.toString().toUpperCase();
-    final keyPart = hexString.substring(0, 16);
+    var bytes = utf8.encode(deviceId + _secretSalt);
+    var digest = sha256.convert(bytes).toString().toUpperCase();
+
+    String part1 = digest.substring(0, 4);
+    String part2 = digest.substring(4, 8);
 
     setState(() {
-      _generatedKey =
-          "${keyPart.substring(0, 4)}-${keyPart.substring(4, 8)}-${keyPart.substring(8, 12)}-${keyPart.substring(12, 16)}";
+      _generatedCode = "STUG-$part1-$part2";
     });
+  }
+
+  void _copyToClipboard() {
+    if (_generatedCode.isNotEmpty) {
+      Clipboard.setData(ClipboardData(text: _generatedCode));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("تم نسخ كود التفعيل بنجاح!")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('مولّد مفاتيح التفعيل'),
+        title: const Text("مولد مفاتيح كنترول الاختبارات"),
         centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Icon(
-              Icons.vpn_key_rounded,
-              size: 80,
-              color: Colors.deepPurple,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'لوحة تفعيل أجهزة المستخدمين',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'أدخل معرّف الجهاز الذي أرسله لك الزبون لتوليد مفتاح التفعيل المخصص له',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 13),
-            ),
-            const SizedBox(height: 28),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Icon(Icons.key_sharp, size: 70, color: Colors.teal),
+              const SizedBox(height: 16),
+              const Text(
+                "توليد كود التفعيل للعميل",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
 
-            // حقل إدخال Device ID
-            TextField(
-              controller: _deviceIdController,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
-              decoration: InputDecoration(
-                labelText: 'معرّف الجهاز (Device ID)',
-                hintText: 'مثال: 8f3b2a9d10e5f221',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                prefixIcon: const Icon(Icons.phone_android),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _deviceIdController.clear();
-                    setState(() {
-                      _generatedKey = "";
-                    });
-                  },
+              // حقل إدخال Device ID
+              TextField(
+                controller: _deviceIdController,
+                decoration: InputDecoration(
+                  labelText: "معرف جهاز العميل (Device ID)",
+                  hintText: "أدخل أو الصق المعرف هنا",
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.phone_android),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.paste),
+                    onPressed: () async {
+                      ClipboardData? data = await Clipboard.getData('text/plain');
+                      if (data != null && data.text != null) {
+                        _deviceIdController.text = data.text!;
+                      }
+                    },
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            // زر التوليد
-            ElevatedButton.icon(
-              onPressed: _generateKey,
-              icon: const Icon(Icons.auto_awesome),
-              label: const Text('توليد المفتاح الآن', style: TextStyle(fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              // زر التوليد
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
+                onPressed: _generateCode,
+                icon: const Icon(Icons.bolt),
+                label: const TextStyle(fontSize: 18) == null
+                    ? const Text("توليد كود التفعيل")
+                    : const Text("توليد كود التفعيل", style: TextStyle(fontSize: 18)),
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            // كارت عرض مفتاح التفعيل المولّد
-            if (_generatedKey.isNotEmpty) ...[
-              Card(
-                color: Colors.deepPurple.shade50,
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Colors.deepPurple, width: 1.5),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+              // عرض كود التفعيل الناتج
+              if (_generatedCode.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.teal),
+                  ),
                   child: Column(
                     children: [
                       const Text(
-                        'مفتاح التفعيل الخاص بالجهاز:',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        "كود التفعيل الخاص بالعميل:",
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
                       SelectableText(
-                        _generatedKey,
+                        _generatedCode,
                         style: const TextStyle(
-                          fontSize: 22,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: Colors.teal,
                           letterSpacing: 2,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       ElevatedButton.icon(
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: _generatedKey));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('تم نسخ مفتاح التفعيل للحافظة بنجاح!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.copy),
-                        label: const Text('نسخ المفتاح لإرساله للزبون'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: Colors.teal.shade700,
                           foregroundColor: Colors.white,
                         ),
+                        onPressed: _copyToClipboard,
+                        icon: const Icon(Icons.copy),
+                        label: const Text("نسخ الكود لفي الملاحظات أو واتساب"),
                       ),
                     ],
                   ),
                 ),
-              ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
