@@ -1,5 +1,5 @@
-name: control_key_gen
-description: "تطبيق مولّد مفاتيح التفعيل المخصص لتطبيق الأتمتة المصغرة للإختبارات"
+name: key_generator_app
+description: "تطبيق مولّد مفاتيح التفعيل المخصص لتطبيق مولد أوراق الإختبارات"
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -13,6 +13,10 @@ dependencies:
     
   # مكتبة التشفير لتوليد المفاتيح بنفس خوارزمية SHA-256
   crypto: ^3.0.3
+
+  # مكتبة دعم الخدمات والنظام للتعامل مع الحافظة (Copy/Paste)
+  flutter_services:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
